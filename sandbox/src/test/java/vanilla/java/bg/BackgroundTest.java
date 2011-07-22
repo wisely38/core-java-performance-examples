@@ -113,7 +113,8 @@ public class BackgroundTest {
         scb.close();
 
         Arrays.sort(times);
-        System.out.printf("Average/90/99/99.9/99.99%% times were %,d / %,d / %,d / %,d / %,d %n",
+        System.out.printf("best/Average/90/99/99.9/99.99%% times were %,d / %,d / %,d / %,d / %,d / %,d %n",
+                times[0],
                 times[times.length / 2],
                 times[times.length * 9 / 10],
                 times[times.length - times.length / 100],

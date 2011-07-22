@@ -1,6 +1,8 @@
 package vanilla.java.bg;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ByteChannel;
 import java.util.logging.Level;
@@ -29,7 +31,9 @@ public class BackgroundChannel extends BackgroundDataOutput {
         // do something with the data
         try {
             wb.flip();
-            channel.write(wb);
+            do {
+                channel.write(wb);
+            } while (wb.remaining() > 0);
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, source + ": Unable to write", e);
         } finally {
