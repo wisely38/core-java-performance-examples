@@ -10,7 +10,7 @@ import java.io.IOException;
 public class SocketPipeTest {
     @Test
     public void testPerf() throws IOException {
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 6; i++) {
             IOPerfTests.testThroughput(new SocketPipe());
             IOPerfTests.testLatency(new SocketPipe(), 100, 1000);
         }

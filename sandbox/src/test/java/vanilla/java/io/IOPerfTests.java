@@ -29,7 +29,7 @@ public enum IOPerfTests {
                     long num = in.getLong();
                     if (num != expected) {
                         lastExpected.set(Long.MAX_VALUE);
-                        throw new AssertionError("Expected " + expected + " but got " + num);
+                        throw new AssertionError("Expected " + expected + " but got " + Long.toHexString(num));
                     }
                     long num2 = in.getLong();
                     if (num != num2) {
@@ -96,7 +96,7 @@ public enum IOPerfTests {
         });
 
         long start = System.nanoTime();
-        long end = start + 5L * 1000 * 1000 * 1000;
+        long end = start + 20L * 1000 * 1000 * 1000;
         long count = 0;
         do {
             for (int i = 0; i < 1000; i++) {
@@ -123,10 +123,11 @@ public enum IOPerfTests {
         while (lastExpected.get() < count) ;
         pipe.close();
 
-        System.out.printf("%s: Latency for 50/99/99.99 %%tile is %s / %s / %s μs%n",
+        System.out.printf("%s: Latency for 50/99/99.9/99.99 %%tile is %s / %s / %s / %s μs%n",
                 nameOf(pipe),
                 asString(fromEnd(latencies, count / 2) * latencyRes / 1000.0),
                 asString(fromEnd(latencies, count / 100) * latencyRes / 1000.0),
+                asString(fromEnd(latencies, count / 1000) * latencyRes / 1000.0),
                 asString(fromEnd(latencies, count / 10000) * latencyRes / 1000.0)
         );
     }

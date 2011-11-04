@@ -7,12 +7,12 @@ import java.io.IOException;
 /**
  * @author peter.lawrey
  */
-public class NioPipeTest {
+public class StealingPipeTest {
     @Test
     public void testPerf() throws IOException {
         for (int i = 0; i < 6; i++) {
-            IOPerfTests.testThroughput(new NioPipe());
-            IOPerfTests.testLatency(new NioPipe(), 100, 1000);
+            IOPerfTests.testThroughput(new StealingPipe());
+            IOPerfTests.testLatency(new StealingPipe(), 5, 60);
         }
     }
 }
