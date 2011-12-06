@@ -1,7 +1,7 @@
 package vanilla.java.io;
 
-import vanilla.java.io.api.BufferPartialSource;
 import vanilla.java.io.api.BufferPipe;
+import vanilla.java.io.api.BufferSource;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -14,14 +14,16 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * Pipe which passes via a socket.
+ *
  * @author peter.lawrey
  */
-public class SocketPipe implements BufferPipe<BufferPartialSource> {
+public class SocketPipe implements BufferPipe {
     private static final int DEFAULT_CAPACITY = 32 * 1024;
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final ByteBuffer bb;
     private final SocketChannel sink;
-    private BufferPartialSource source = null;
+    private BufferSource source = null;
 
     public SocketPipe() throws IOException {
         bb = createBuffer();
@@ -75,7 +77,7 @@ public class SocketPipe implements BufferPipe<BufferPartialSource> {
     }
 
     @Override
-    public void setSource(BufferPartialSource source) {
+    public void setSource(BufferSource source) {
         this.source = source;
     }
 

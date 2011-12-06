@@ -11,8 +11,8 @@ public class NioPipeTest {
     @Test
     public void testPerf() throws IOException {
         for (int i = 0; i < 6; i++) {
-            IOPerfTests.testThroughput(new NioPipe());
-            IOPerfTests.testLatency(new NioPipe(), 100, 1000);
+            int delay = IOPerfTests.testThroughput(new NioPipe());
+            IOPerfTests.testLatency(new NioPipe(), 100, delay);
         }
     }
 }

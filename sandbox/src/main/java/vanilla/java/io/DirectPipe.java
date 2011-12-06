@@ -1,24 +1,26 @@
 package vanilla.java.io;
 
-import vanilla.java.io.api.BufferPartialSource;
 import vanilla.java.io.api.BufferPipe;
+import vanilla.java.io.api.BufferSource;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * Pipe which passes directly in the same thread.
+ *
  * @author peter.lawrey
  */
-public class DirectPipe implements BufferPipe<BufferPartialSource> {
+public class DirectPipe implements BufferPipe {
     private final ByteBuffer bb;
-    private BufferPartialSource source = null;
+    private BufferSource source = null;
 
     public DirectPipe(int capacity) {
         bb = ByteBuffer.allocateDirect(capacity).order(ByteOrder.nativeOrder());
     }
 
     @Override
-    public void setSource(BufferPartialSource source) {
+    public void setSource(BufferSource source) {
         this.source = source;
     }
 

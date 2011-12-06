@@ -1,7 +1,7 @@
 package vanilla.java.io;
 
-import vanilla.java.io.api.BufferPartialSource;
 import vanilla.java.io.api.BufferPipe;
+import vanilla.java.io.api.BufferSource;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,15 +12,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
+ * Pipe using NIO.
+ *
  * @author peter.lawrey
  */
-public class NioPipe implements BufferPipe<BufferPartialSource> {
+public class NioPipe implements BufferPipe {
     private static final int DEFAULT_CAPACITY = 32 * 1024;
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final ByteBuffer bb;
     private final Pipe pipe;
     private final Pipe.SinkChannel sink;
-    private BufferPartialSource source = null;
+    private BufferSource source = null;
 
     public NioPipe() throws IOException {
         bb = createBuffer();
@@ -64,7 +66,7 @@ public class NioPipe implements BufferPipe<BufferPartialSource> {
     }
 
     @Override
-    public void setSource(BufferPartialSource source) {
+    public void setSource(BufferSource source) {
         this.source = source;
     }
 

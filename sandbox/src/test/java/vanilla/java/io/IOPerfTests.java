@@ -1,6 +1,5 @@
 package vanilla.java.io;
 
-import vanilla.java.io.api.BufferPartialSource;
 import vanilla.java.io.api.BufferPipe;
 import vanilla.java.io.api.BufferSource;
 import vanilla.java.lang.HiresTimer;
@@ -18,7 +17,7 @@ public enum IOPerfTests {
         HiresTimer.init();
     }
 
-    public static void testThroughput(BufferPipe<BufferPartialSource> pipe) {
+    public static int testThroughput(BufferPipe pipe) {
         final AtomicLong lastExpected = new AtomicLong(-1);
         pipe.setSource(new BufferSource() {
             long expected = 0;
@@ -62,9 +61,10 @@ public enum IOPerfTests {
         pipe.close();
         long time = System.nanoTime() - start;
         System.out.printf("%s: Throughput %.1f M msg/s%n", nameOf(pipe), count * 1000.0 / time);
+        return (int) (time / count + 1);
     }
 
-    public static void testLatency(BufferPipe<BufferPartialSource> pipe, final int latencyRes, int pauseUS) {
+    public static void testLatency(BufferPipe pipe, final int latencyRes, int pauseNS) {
         final AtomicLong lastExpected = new AtomicLong(-1);
         final int[] latencies = new int[20 * 1000 + 1];
 
@@ -105,7 +105,7 @@ public enum IOPerfTests {
                 bb.putLong(HiresTimer.nanoTime());
                 pipe.release(bb);
                 // pause briefly.
-                long endPause = HiresTimer.nanoTime() + pauseUS;
+                long endPause = HiresTimer.nanoTime() + pauseNS;
                 while (HiresTimer.nanoTime() < endPause) ;
             }
         } while (end > System.nanoTime());

@@ -1,8 +1,7 @@
 package vanilla.java.io;
 
-import vanilla.java.io.api.BufferPartialSource;
 import vanilla.java.io.api.BufferPipe;
-import vanilla.java.lang.PaddedAtomicInteger;
+import vanilla.java.io.api.BufferSource;
 import vanilla.java.lang.PaddedAtomicLong;
 
 import java.io.IOException;
@@ -11,25 +10,22 @@ import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author peter.lawrey
  */
-public class StealingPipe implements BufferPipe<BufferPartialSource> {
+public class StealingPipe implements BufferPipe {
     private static final int DEFAULT_CAPACITY = 64 * 1024;
     private final ExecutorService service = Executors.newSingleThreadExecutor();
     private final ByteBuffer writeBuffer = createBuffer();
+    private final PaddedAtomicLong writeCount = new PaddedAtomicLong();
+    private final PaddedAtomicLong writeBatch = new PaddedAtomicLong();
+    private final PaddedAtomicLong pad = new PaddedAtomicLong();
+    private final PaddedAtomicLong readCount = new PaddedAtomicLong();
+    private final PaddedAtomicLong readBatch = new PaddedAtomicLong();
     private final ByteBuffer readBuffer = writeBuffer.slice().order(ByteOrder.nativeOrder());
 
-    private final AtomicInteger readCount = new PaddedAtomicInteger();
-    private final AtomicLong readBatch = new PaddedAtomicLong();
-
-    private final AtomicInteger writeCount = new PaddedAtomicInteger();
-    private final AtomicLong writeBatch = new PaddedAtomicLong();
-
-    private BufferPartialSource source = null;
+    private BufferSource source = null;
 
     public StealingPipe() throws IOException {
         service.execute(new Runnable() {
@@ -48,7 +44,7 @@ public class StealingPipe implements BufferPipe<BufferPartialSource> {
                                 throw new IllegalStateException();
                             }
                         }
-                        int rc = readCount.get(), wc;
+                        long rc = readCount.get(), wc;
                         // is there more to read?
                         while (((wc = writeCount.get()) - rc) <= 0) {
                             if (service.isShutdown())
@@ -56,14 +52,14 @@ public class StealingPipe implements BufferPipe<BufferPartialSource> {
                             if (readBatch.get() != writeBatch.get())
                                 continue LOOP;
                         }
-                        readBuffer.limit(wc);
-                        readBuffer.position(rc);
+                        readBuffer.limit((int) wc);
+                        readBuffer.position((int) rc);
 
                         source.consume(readBuffer);
                         if (readBuffer.remaining() != 0)
                             throw new AssertionError(source + " failed to read all");
 
-                        readCount.lazySet(wc);
+                        readCount.set(wc);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -89,7 +85,7 @@ public class StealingPipe implements BufferPipe<BufferPartialSource> {
     }
 
     @Override
-    public void setSource(BufferPartialSource source) {
+    public void setSource(BufferSource source) {
         this.source = source;
     }
 
@@ -114,7 +110,7 @@ public class StealingPipe implements BufferPipe<BufferPartialSource> {
 
     @Override
     public void release(ByteBuffer bb) {
-        writeCount.lazySet(bb.position());
+        writeCount.set(bb.position());
     }
 
     @Override

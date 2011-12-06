@@ -1,7 +1,5 @@
 package vanilla.java.lang;
 
-import java.util.concurrent.atomic.AtomicLong;
-
 /**
  * @author peter.lawrey
  */
@@ -12,7 +10,7 @@ public enum HiresTimer {
     public static final int FACTOR_PRECISION_BITS = 10;
 
     static class CounterHolder {
-        private static final AtomicLong counter = new PaddedAtomicLong();
+        private static final PaddedAtomicLong counter = new PaddedAtomicLong();
     }
 
     static {
